@@ -1,0 +1,84 @@
+services:
+  trino-gateway:
+    image: trinodb/trino-gateway:latest
+    container_name: trino-gateway
+    hostname: trino-gateway
+    networks:
+      iceberg_net:
+        aliases:
+          - trino-gateway
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+      - ./trino-gateway/gateway-ha-config.yml:/opt/trino/gateway-ha-config.yml
+      - ./trino-gateway/log.properties:/opt/trino/log.properties
+      - ./trino-gateway/certs/private.key:/etc/certs/private.key
+      - ./trino-gateway/certs/public.key:/etc/certs/public.key
+    depends_on:
+      trino-1:
+        condition: service_healthy
+      trino-2:
+        condition: service_healthy
+  trino-1:
+    image: trinodb/trino:latest
+    container_name: trino-1
+    hostname: trino-1
+    networks:
+      iceberg_net:
+        aliases:
+          - trino-1
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/info"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  trino-2:
+    image: trinodb/trino:latest
+    container_name: trino-2
+    hostname: trino-2
+    networks:
+      iceberg_net:
+        aliases:
+          - trino-2
+    ports:
+      - "8082:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/info"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  postgresdb:
+    image: postgres:17.2
+    container_name: postgresdb
+    hostname: postgresdb
+    networks:
+      iceberg_net:
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=gateway
+      - PGUSER=postgres
+    volumes:
+      - postgresdb-data:/var/lib/postgresql
+      - ./trino-gateway/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
+      - ./trino-gateway/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "iceberg"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+networks:
+  iceberg_net:
+
+volumes:
+  postgresdb-data:
