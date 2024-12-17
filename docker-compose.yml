@@ -72,7 +72,7 @@ services:
       - ./trino-gateway/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
       - ./trino-gateway/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "iceberg"]
+      test: ["CMD-SHELL", "pg_isready", "-d", "gateway", "-U", "postgres"]
       interval: 30s
       timeout: 60s
       retries: 5

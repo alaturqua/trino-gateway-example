@@ -46,41 +46,21 @@ graph TD
 ## Configuration
 
 ### Gateway Configuration
-The gateway configuration is located in 
-
-gateway-ha-config.yml
-
-. It includes settings for server configuration, data store, authentication, and authorization.
+The gateway configuration is located in `gateway-ha-config.yml`. It includes settings for server configuration, data store, authentication, and authorization.
 
 ### Certificates
-The public and private keys for authentication are located in the 
-
-certs
-
- directory.
+The public and private keys for authentication are located in the `certs` directory.
 
 ### Logging
-Logging configuration is defined in 
-
-log.properties
-
-.
+Logging configuration is defined in `log.properties`.
 
 ## Database Initialization
-The PostgreSQL database is initialized with the scripts located in the 
-
-trino-gateway
-
- directory:
-- init-user-db.sh
-- create-multiple-postgresql-databases.sh
+The PostgreSQL database is initialized with the scripts located in the `trino-gateway` directory:
+- `init-user-db.sh`
+- `create-multiple-postgresql-databases.sh`
 
 ## Health Checks
-Health checks are configured for all services in the 
-
-docker-compose.yml
-
- file to ensure they are running correctly.
+Health checks are configured for all services in the `docker-compose.yml` file to ensure they are running correctly.
 
 ## Stopping the Services
 To stop the services, run:
