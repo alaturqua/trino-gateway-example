@@ -6,20 +6,50 @@ The Trino Gateway is a high-availability gateway for Trino clusters. It provides
 ## Architecture
 
 ```mermaid
-graph TD
-    A[User] -->|HTTP Requests| B[Trino Gateway]
-    B -->|Routes Queries| C[Trino-1]
-    B -->|Routes Queries| D[Trino-2]
-    B -->|Stores Query History| E[PostgreSQL]
-
-    subgraph Trino Clusters
-        C[Trino-1]
-        D[Trino-2]
+graph LR
+    subgraph "Query Layer"
+        TG[Trino Gateway<br/>:8080]
+        T1[Trino 1<br/>:8081]
+        T2[Trino 2<br/>:8082]
     end
 
-    subgraph Database
-        E[PostgreSQL]
+    subgraph "Metadata Layer"
+        HMS1[Hive Metastore<br/>:9083]
+        PG[(PostgreSQL<br/>:5432)]
     end
+
+    subgraph "Storage Layer"
+        MINIO[MinIO<br/>:9000/9001]
+        ICE[/Iceberg Tables/]
+        DELTA[/Delta Tables/]
+        HIVE[/Hive Tables/]
+    end
+
+    %% Connections
+    TG -->|Load Balance| T1
+    TG -->|Load Balance| T2
+    
+    T1 -.->|Metadata| HMS1
+    T2 -.->|Metadata| HMS1
+    
+    HMS1 -->|Store Metadata| PG
+    
+    T1 -->|Read/Write Data| MINIO
+    T2 -->|Read/Write Data| MINIO
+    
+    MINIO -->|Store| ICE
+    MINIO -->|Store| DELTA
+    MINIO -->|Store| HIVE
+
+    classDef gateway fill:#f96,stroke:#333
+    classDef query fill:#58f,stroke:#333
+    classDef meta fill:#5f5,stroke:#333
+    classDef storage fill:#fa0,stroke:#333
+    
+    class TG gateway
+    class T1,T2, query
+    class HMS1,PG meta
+    class MINIO,ICE,DELTA,HIVE storage
 ```
 
 ## Prerequisites
@@ -39,9 +69,10 @@ graph TD
 
 3. **Verify the services:**
    - Trino Gateway: [http://localhost:8080](http://localhost:8080)
-   - Trino-1: [http://localhost:8081](http://localhost:8081)
+   - Trino-1: [http://localhost:8080](http://localhost:8080)
    - Trino-2: [http://localhost:8082](http://localhost:8082)
    - PostgreSQL: [http://localhost:5432](http://localhost:5432)
+   - Hive Metastore: [thrift://localhost:9083](thrift://localhost:9083)
 
 ## Configuration
 
