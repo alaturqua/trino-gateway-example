@@ -41,10 +41,10 @@ graph LR
     MINIO -->|Store| DELTA
     MINIO -->|Store| HIVE
 
-    classDef gateway fill:#f96,stroke:#333
-    classDef query fill:#58f,stroke:#333
-    classDef meta fill:#5f5,stroke:#333
-    classDef storage fill:#fa0,stroke:#333
+    classDef gateway fill:#f96,stroke:#333,color:#000
+    classDef query fill:#58f,stroke:#333,color:#000
+    classDef meta fill:#5f5,stroke:#333,color:#000
+    classDef storage fill:#fa1,stroke:#333,color:#000
     
     class TG gateway
     class T1,T2, query
