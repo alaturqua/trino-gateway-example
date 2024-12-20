@@ -69,7 +69,7 @@ graph LR
 
 3. **Verify the services:**
    - Trino Gateway: [http://localhost:8080](http://localhost:8080)
-   - Trino-1: [http://localhost:8080](http://localhost:8080)
+   - Trino-1: [http://localhost:8081](http://localhost:8081)
    - Trino-2: [http://localhost:8082](http://localhost:8082)
    - PostgreSQL: [http://localhost:5432](http://localhost:5432)
    - Hive Metastore: [thrift://localhost:9083](thrift://localhost:9083)
